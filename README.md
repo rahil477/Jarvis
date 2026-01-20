@@ -119,6 +119,9 @@ Currently, the assistant follows predefined logic. By integrating Generative AI 
 To make the assistant more advanced, computer vision can be introduced for features like face detection and gesture control. Learning image and video processing fundamentals is a good starting point.  
 👉 [Computer Vision Essentials](https://www.mygreatlearning.com/academy/learn-for-free/courses/computer-vision-essentials)
 
+### 📄 Related Reading
+For a conceptual overview of building voice assistants in Python, you can refer to this article: [CLICK HERE](https://www.mygreatlearning.com/blog/jarvis-desktop-assistant-python-project/)
+
 ---
 
 > *Some learning resources mentioned above are shared as part of an educational collaboration.*
