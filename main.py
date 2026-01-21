@@ -1,14 +1,15 @@
-import sys
-import os
-import time
-import threading
-import queue
 import re
 import random
+import schedule
+import psutil
 from Jarvis.core.brain import JarvisBrain
 from Jarvis.core.config import config
+from Jarvis.core.router import TaskRouter
+from Jarvis.core.evolution import SelfEvolution
 from Jarvis.features.voice import VoiceEngine
 from Jarvis.features.vision import VisionEngine
+from Jarvis.features.gestures import GestureEngine
+from Jarvis.features.web import WebEngine
 from Jarvis.utils.logger import logger
 from Jarvis.utils.security import SecurityManager
 from Jarvis.prompts import UNIFIED_SYSTEM_PROMPT
@@ -19,14 +20,24 @@ class JarvisAgent:
         self.brain = JarvisBrain()
         self.voice = VoiceEngine()
         self.vision = VisionEngine()
+        self.gestures = GestureEngine()
+        self.web = WebEngine()
+        self.evolution = SelfEvolution()
         self.security = SecurityManager()
         self.command_queue = queue.Queue()
         self.is_running = True
         self.tools = self._init_tools()
+        
+        # Start Background Jobs
+        self.gestures.start(self._handle_gesture)
+        threading.Thread(target=self._run_scheduler, daemon=True).start()
 
     def _init_tools(self):
         return {
-            "SEARCH_WEB": lambda q: f"Searching web for: {q}",
+            "SEARCH_WEB": lambda q: self.web.search(q),
+            "DEEP_RESEARCH": lambda q: self.web.deep_research(q),
+            "EVOLVE_SELF": lambda q: self.evolution.generate_new_tool(q),
+            "GENERATE_REPORT": lambda x: self.evolution.get_learned_report(),
             "VISION": lambda p: self.vision.analyze_image(self.vision.capture_screen(), p),
             "WEBCAM": lambda p: self.vision.analyze_image(self.vision.capture_webcam(), p),
             "SYSTEM_STATS": lambda x: f"CPU: {psutil.cpu_percent()}%, RAM: {psutil.virtual_memory().percent}%",
@@ -41,11 +52,10 @@ class JarvisAgent:
         query = self.security.validate_input(query)
         if not query: return "Invalid input received."
 
-        # Feedback detection
-        if any(w in query.lower() for w in ["səhv", "wrong", "sehv", "təzədən", "düzgün deyil"]):
-            self.brain.update_reward(success=False)
-            self.brain._update_ab_metrics(ab_variant, success=False)
-
+        # TIER 1: Multi-model Orchestration (Task Routing)
+        target_model = TaskRouter.route(query)
+        logger.info(f"Targeting model: {target_model}")
+        
         context = self.brain.get_context(query)
         messages = [
             {"role": "system", "content": UNIFIED_SYSTEM_PROMPT},
@@ -56,7 +66,7 @@ class JarvisAgent:
         try:
             for step in range(config.MAX_REASONING_STEPS):
                 import ollama
-                resp = ollama.chat(model=config.OLLAMA_MODEL, messages=messages)
+                resp = ollama.chat(model=target_model, messages=messages)
                 content = resp['message']['content']
                 messages.append({"role": "assistant", "content": content})
 
@@ -82,6 +92,31 @@ class JarvisAgent:
         except Exception as e:
             logger.error(f"Brain reasoning failed: {e}")
             return "Zihnimdə bir xəta baş verdi, üzr istəyirəm."
+
+    def _run_scheduler(self):
+        """Tier 4: Autonomous Task Execution Scheduler"""
+        schedule.every().day.at("09:00").do(lambda: self.command_queue.put(("AUTO", "Günlük brifinq hazırla")))
+        schedule.every(2).hours.do(lambda: logger.info("Autonomous health check..."))
+        
+        while self.is_running:
+            schedule.run_pending()
+            time.sleep(60)
+
+    def _handle_gesture(self, gesture):
+        """Tier 2: Gesture Interface Handlers"""
+        logger.info(f"GESTURE DETECTED: {gesture}")
+        if gesture == "THUMBS_UP":
+            self.command_queue.put(("GESTURE", "Confirm/Yes"))
+            # Could trigger a specific confirmation in the brain
+        elif gesture == "PEACE_SIGN":
+            # Auto-screenshot and analyze (Tier 2 Vision)
+            logger.info("Gesture-triggered screen scan.")
+            self.ask("Ekranı analiz et və vacib məlumatları de.")
+        elif gesture == "OPEN_PALM":
+            # Pause jarvis voice
+            import pygame
+            pygame.mixer.music.stop()
+            logger.info("Voice paused via gesture.")
 
     def start_gui(self):
         from Jarvis.ui.gui import JarvisGUI

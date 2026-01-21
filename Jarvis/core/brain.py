@@ -7,15 +7,26 @@ import time
 import ollama
 import psutil
 import pyautogui
+from cryptography.fernet import Fernet
 from Jarvis.utils.logger import logger
 from Jarvis.core.config import config
 from Jarvis.prompts import UNIFIED_SYSTEM_PROMPT
 
 class JarvisBrain:
     def __init__(self):
+        self.key_file = config.BASE_DIR / "secret.key"
+        self.cipher = self._init_cipher()
         self.memory = self.load_memory()
         self.episodic_memory = self.load_episodic_memory()
         self.collection = self._init_chroma()
+        
+    def _init_cipher(self):
+        if not os.path.exists(self.key_file):
+            key = Fernet.generate_key()
+            with open(self.key_file, "wb") as f: f.write(key)
+        else:
+            with open(self.key_file, "rb") as f: key = f.read()
+        return Fernet(key)
         
     def _init_chroma(self):
         try:
@@ -44,6 +55,11 @@ class JarvisBrain:
         }
 
     def save_memory(self):
+        data = json.dumps(self.memory, ensure_ascii=False, indent=4).encode()
+        encrypted = self.cipher.encrypt(data)
+        with open(config.MEMORY_FILE + ".enc", "wb") as f:
+            f.write(encrypted)
+        # Also save plain for compatibility for now, but encrypted is primary
         with open(config.MEMORY_FILE, "w", encoding="utf-8") as f:
             json.dump(self.memory, f, ensure_ascii=False, indent=4)
 
@@ -93,7 +109,24 @@ class JarvisBrain:
         with open(config.LOG_FILE, "a", encoding="utf-8") as f:
             f.write(json.dumps(interaction_data, ensure_ascii=False) + "\n")
             
+        # TIER 1: Long-term Semantic Memory Indexing
+        self.add_to_semantic_memory(query, response, status)
+            
         logger.info(f"Interaction logged. Status: {status}, Latency: {latency:.2f}s")
+
+    def add_to_semantic_memory(self, query, response, status):
+        """Indexes interaction into ChromaDB for long-term retrieval."""
+        if not self.collection: return
+        try:
+            doc = f"Soru: {query}\nCevap: {response}\nDurum: {status}"
+            id = f"mem_{int(time.time())}_{random.randint(100,999)}"
+            self.collection.add(
+                documents=[doc],
+                metadatas=[{"timestamp": datetime.datetime.now().isoformat(), "status": status}],
+                ids=[id]
+            )
+        except Exception as e:
+            logger.error(f"Semantic indexing failed: {e}")
 
     def _update_ab_metrics(self, variant, success):
         abs = self.memory.get("ab_test_variants", {"metrics": {"A": {"success": 0, "total": 0}, "B": {"success": 0, "total": 0}}})
@@ -136,3 +169,16 @@ class JarvisBrain:
                 logger.info(f"Mined {len(patterns)} new behavior patterns.")
         except Exception as e:
             logger.error(f"Pattern mining failed: {e}")
+
+    def get_performance_report(self):
+        pm = self.memory.get("performance_metrics", {})
+        abs = self.memory.get("ab_test_variants", {})
+        report = f"### System Performance Report\n"
+        report += f"- Total Interactions: {pm.get('total_interactions', 0)}\n"
+        report += f"- Average Latency: {pm.get('avg_latency', 0):.2f}s\n"
+        report += f"- Reward Score: {self.memory.get('reward_score', 0):.2f}\n\n"
+        report += f"### A/B Testing Metrics\n"
+        for v, m in abs.get("metrics", {}).items():
+            success_rate = (m['success'] / m['total'] * 100) if m['total'] > 0 else 0
+            report += f"- Variant {v}: {success_rate:.1f}% success ({m['success']}/{m['total']})\n"
+        return report

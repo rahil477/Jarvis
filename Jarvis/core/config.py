@@ -14,6 +14,15 @@ class Config:
     OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
     OLLAMA_VISION_MODEL = os.getenv("OLLAMA_VISION_MODEL", "llava")
     
+    # Tier 1: Multi-model Orchestration
+    MODEL_MAP = {
+        "complex": "llama3.2:latest", # 70b placeholder if not available
+        "fast": "phi-3",
+        "code": "mistral",
+        "logic": "deepseek-r1:7b",
+        "vision": "llava"
+    }
+    
     # Audio
     TTS_VOICE = os.getenv("TTS_VOICE", "tr-TR-AhmetNeural")
     VOSK_MODEL_PATH = os.getenv("VOSK_MODEL_PATH", str(BASE_DIR / "model" / "tr"))
