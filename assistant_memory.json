@@ -1,101 +1,40 @@
 {
-    "learning_mode": true,
-    "xp": 100,
-    "level": 2,
     "user": {
         "name": "Rahil Menefzade",
         "location": "Azerbaijan",
-        "timezone": "Asia/Baku",
         "preferences": {
             "language": [
-                "tr",
                 "az",
-                "en",
-                "ru"
+                "tr",
+                "en"
             ],
             "wake_word": "Salam Jarvis",
-            "gesture_activation": "double_clap",
-            "greeting_by_time": true,
-            "offline_first": true,
-            "self_learning": true,
-            "human_approval_required": true
+            "response_style": "technical",
+            "gesture_activation": "double_clap"
         },
-        "tech_stack": {
-            "LLM": [
-                "Ollama",
-                "Mistral",
-                "LLaMA3"
-            ],
-            "TTS": [
-                "Coqui",
-                "Piper",
-                "Edge-TTS"
-            ],
-            "STT": [
-                "SpeechRecognition",
-                "Vosk",
-                "Whisper"
-            ],
-            "gesture": [
-                "Pynput",
-                "Mediapipe",
-                "Porcupine"
-            ],
-            "app_integration": [
-                "Telegram API",
-                "Gmail API",
-                "PyAutoGUI",
-                "Selenium"
-            ]
-        },
-        "functionality": {
-            "local_commands": true,
-            "LLM_fallback": true,
-            "unread_messages_alert": true,
-            "app_automation": [
-                "Spotify",
-                "Telegram",
-                "Gmail",
-                "Notepad",
-                "Browser"
-            ],
-            "proactive_tasks": [
-                "reminders",
-                "weather",
-                "daily_plan"
-            ],
-            "multimodal_input": [
-                "text",
-                "voice",
-                "image",
-                "file"
-            ],
-            "GUI_HUD": true,
-            "gamification": true,
-            "offline_knowledge_base": [
-                "Wikipedia",
-                "Dictionary",
-                "FAQ"
-            ]
-        }
+        "habits": [],
+        "projects": []
     },
-    "learned_skills": {},
-    "user_info": {},
-    "projects": [],
+    "episodic_memory": [],
+    "semantic_knowledge": {},
+    "procedural_memory": {},
+    "learning_history": [],
+    "reward_score": 0.5,
     "ab_test_variants": {
+        "active_variant": "A",
         "metrics": {
             "A": {
                 "success": 0,
                 "total": 0
             },
             "B": {
-                "success": 1,
-                "total": 1
+                "success": 0,
+                "total": 0
             }
         }
     },
     "performance_metrics": {
-        "avg_latency": 12.191159009933472,
-        "total_interactions": 1
+        "avg_latency": 0,
+        "total_interactions": 0
     }
 }
