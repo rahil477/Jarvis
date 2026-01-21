@@ -10,6 +10,7 @@ from Jarvis.features.voice import VoiceEngine
 from Jarvis.features.vision import VisionEngine
 from Jarvis.features.gestures import GestureEngine
 from Jarvis.features.web import WebEngine
+from Jarvis.features.api_hub import APIHub
 from Jarvis.utils.logger import logger
 from Jarvis.utils.security import SecurityManager
 from Jarvis.prompts import UNIFIED_SYSTEM_PROMPT
@@ -22,6 +23,7 @@ class JarvisAgent:
         self.vision = VisionEngine()
         self.gestures = GestureEngine()
         self.web = WebEngine()
+        self.api = APIHub()
         self.evolution = SelfEvolution()
         self.security = SecurityManager()
         self.command_queue = queue.Queue()
@@ -38,6 +40,9 @@ class JarvisAgent:
             "DEEP_RESEARCH": lambda q: self.web.deep_research(q),
             "EVOLVE_SELF": lambda q: self.evolution.generate_new_tool(q),
             "GENERATE_REPORT": lambda x: self.evolution.get_learned_report(),
+            "GMAIL_INBOX": lambda x: self.api.list_unread_emails(),
+            "GITHUB_PUSH": lambda q: self.api.github_push("origin/main", q),
+            "NOTION_LOG": lambda q: self.api.notion_save_log(q),
             "VISION": lambda p: self.vision.analyze_image(self.vision.capture_screen(), p),
             "WEBCAM": lambda p: self.vision.analyze_image(self.vision.capture_webcam(), p),
             "SYSTEM_STATS": lambda x: f"CPU: {psutil.cpu_percent()}%, RAM: {psutil.virtual_memory().percent}%",
@@ -57,8 +62,14 @@ class JarvisAgent:
         logger.info(f"Targeting model: {target_model}")
         
         context = self.brain.get_context(query)
+        from Jarvis import prompts
+        system_prompt = prompts.UNIFIED_SYSTEM_PROMPT
+        if "vision" in target_model.lower(): system_prompt = prompts.VISION_ENGINE_PROMPT
+        elif any(w in query.lower() for w in ["kod", "yaz", "debug"]): system_prompt = prompts.SELF_CODING_PROMPT
+        elif any(w in query.lower() for w in ["email", "github", "notion"]): system_prompt = prompts.API_HUB_PROMPT
+
         messages = [
-            {"role": "system", "content": UNIFIED_SYSTEM_PROMPT},
+            {"role": "system", "content": system_prompt},
             {"role": "system", "content": f"User: Rahil. Context: {context}. Reward: {self.brain.memory.get('reward_score', 0.5):.2f}"},
             {"role": "user", "content": query}
         ]
@@ -82,7 +93,12 @@ class JarvisAgent:
                 
                 if "CEVAP:" in content:
                     final_text = content.split("CEVAP:")[1].strip()
-                    self.voice.speak(final_text)
+                    
+                    # Tier 2 Voice Adaptation
+                    emotion = "urgent" if "!" in final_text else "neutral"
+                    mode = "soft" if datetime.datetime.now().hour > 22 else "default"
+                    self.voice.speak(final_text, mode=mode, emotion=emotion)
+                    
                     latency = time.time() - start_time
                     self.brain.log_interaction(query, final_text, [], "Success", latency, ab_variant)
                     self.brain.add_to_episodic_memory(query, final_text, "Success")

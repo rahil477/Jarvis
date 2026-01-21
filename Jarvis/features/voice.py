@@ -27,16 +27,29 @@ class VoiceEngine:
                 logger.error(f"Vosk model failed to load: {e}")
         return None
 
-    def speak(self, text):
-        """Asynchronous TTS to prevent UI freezing"""
+    def speak(self, text, mode="default", emotion="neutral"):
+        """Asynchronous TTS with emotional adaptation placeholders"""
         def _run():
             self.is_speaking = True
+            logger.info(f"Speaking (Mode: {mode}, Emotion: {emotion}): {text[:50]}...")
+            
+            # Tier 2: Emotional Adaptation (Simulation)
+            adjusted_text = text
+            if emotion == "urgent":
+                adjusted_text = f"Efendim, diqqət! {text}"
+            elif emotion == "happy":
+                adjusted_text = f"Əla xəbər! {text}"
+
             try:
-                communicate = edge_tts.Communicate(text, config.TTS_VOICE)
+                communicate = edge_tts.Communicate(adjusted_text, config.TTS_VOICE)
                 file_path = "speech.mp3"
                 asyncio.run(communicate.save(file_path))
                 
                 pygame.mixer.music.load(file_path)
+                # Adaptive volume
+                volume = 0.6 if mode == "soft" else 1.0
+                pygame.mixer.music.set_volume(volume)
+                
                 pygame.mixer.music.play()
                 while pygame.mixer.music.get_busy():
                     time.sleep(0.1)

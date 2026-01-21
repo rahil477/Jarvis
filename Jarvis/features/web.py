@@ -26,6 +26,20 @@ class WebEngine:
             logger.error(f"Scraping failed: {e}")
         return ""
 
+    def automated_search(self, query, filters=None):
+        """Tier 3: Web Automation - Intelligent Navigation"""
+        logger.info(f"Automating search for: {query} with filters: {filters}")
+        results = self.search(query)
+        structured_results = []
+        for r in results[:5]:
+            structured_results.append({
+                "title": r.get("title"),
+                "price": "N/A", # Needs vision/scraping to extract
+                "rating": "N/A",
+                "link": r.get("href")
+            })
+        return structured_results
+
     def deep_research(self, topic):
         """Tier 3: Deep Research Mode Implementation"""
         logger.info(f"Starting Deep Research on: {topic}")
@@ -40,3 +54,9 @@ class WebEngine:
                 research_data.append(f"SOURCE: {title}\nURL: {url}\nCONTENT: {content[:1000]}...")
         
         return "\n\n".join(research_data) if research_data else "No data found."
+
+    def auto_fill_form(self, url, data_map):
+        """Tier 3: Web Automation - Form Filling (Mock for now)"""
+        logger.info(f"Attempting to auto-fill form at {url}")
+        # In real implementation, this would use Playwright to find fields and fill
+        return f"Form at {url} filled with {len(data_map)} fields."
