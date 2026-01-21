@@ -64,37 +64,34 @@ class VoiceEngine:
         threading.Thread(target=_run, daemon=True).start()
 
     def listen(self, duration=10):
-        """Offline STT using Vosk"""
+        """Offline STT using Vosk with sounddevice (alternative to pyaudio)"""
         if not self.vosk_model:
             logger.warning("Vosk model not loaded, cannot listen.")
             return ""
 
         try:
-            import pyaudio
-            p = pyaudio.PyAudio()
-            stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8000)
-            rec = vosk.KaldiRecognizer(self.vosk_model, 16000)
+            import numpy as np
+            import sounddevice as sd
             
-            logger.info("Listening...")
-            start_time = time.time()
-            while time.time() - start_time < duration:
-                data = stream.read(4000, exception_on_overflow=False)
-                if len(data) == 0: break
-                
-                # Noise gate
-                rms = audioop.rms(data, 2)
-                if rms < 150: continue
-
-                if rec.AcceptWaveform(data):
-                    result = json.loads(rec.Result())
-                    text = result.get("text", "")
-                    if text:
-                        stream.stop_stream()
-                        stream.close()
-                        p.terminate()
-                        return text.lower()
+            samplerate = 16000
+            rec = vosk.KaldiRecognizer(self.vosk_model, samplerate)
             
-            p.terminate()
+            logger.info("Listening (via sounddevice)...")
+            
+            with sd.RawInputStream(samplerate=samplerate, blocksize=8000, dtype='int16',
+                                   channels=1) as stream:
+                start_time = time.time()
+                while time.time() - start_time < duration:
+                    data, overflowed = stream.read(4000)
+                    if overflowed:
+                        logger.warning("Audio input overflowed.")
+                    
+                    if rec.AcceptWaveform(bytes(data)):
+                        result = json.loads(rec.Result())
+                        text = result.get("text", "")
+                        if text:
+                            return text.lower()
+                            
         except Exception as e:
             logger.error(f"STT Error: {e}")
         return ""

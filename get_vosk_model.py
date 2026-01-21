@@ -1,40 +1,37 @@
-#!/usr/bin/env python3
-"""Vosk model indir ve hazırla - basitleştirilmiş versiyon"""
-
 import os
-import sys
+import requests
+import zipfile
+from Jarvis.core.config import config
+from Jarvis.utils.logger import logger
 
-try:
-    # Bağlantı kontrol et
-    import urllib.request
-    
-    model_dir = os.path.join(os.path.dirname(__file__), "model")
-    tr_model_dir = os.path.join(model_dir, "tr")
-    
-    os.makedirs(model_dir, exist_ok=True)
-    
-    print("Downloading Vosk Turkish model...")
-    print(f"Destination: {tr_model_dir}")
-    
-    # URL - Vosk Turkish small model
+def download_model():
+    model_path = config.VOSK_MODEL_PATH
+    if os.path.exists(model_path):
+        logger.info("Vosk model already exists.")
+        return
+
     url = "https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip"
-    zip_path = os.path.join(model_dir, "model.zip")
+    logger.info(f"Downloading Vosk model from {url}...")
     
-    # İndir
-    urllib.request.urlretrieve(url, zip_path)
-    print("Downloaded successfully")
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    zip_path = "model.zip"
     
-    # Çıkar
-    import zipfile
-    with zipfile.ZipFile(zip_path, 'r') as z:
-        z.extractall(model_dir)
-    print("Extracted")
+    response = requests.get(url, stream=True)
+    with open(zip_path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            f.write(chunk)
+            
+    logger.info("Extracting model...")
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(os.path.dirname(model_path))
     
-    # Temizle
     os.remove(zip_path)
+    # Rename extracted folder to 'tr' if needed
+    extracted_name = "vosk-model-small-tr-0.3"
+    if os.path.exists(os.path.join(os.path.dirname(model_path), extracted_name)):
+        os.rename(os.path.join(os.path.dirname(model_path), extracted_name), model_path)
     
-    print("Ready!")
-    
-except Exception as e:
-    print(f"Error: {e}")
-    sys.exit(1)
+    logger.info("Vosk model setup complete.")
+
+if __name__ == "__main__":
+    download_model()

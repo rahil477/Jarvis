@@ -10,25 +10,35 @@ class TaskRouter:
         TIER 1: Core Intelligence - Multi-model Orchestration
         """
         query_lower = query.lower()
+        target = config.OLLAMA_MODEL
         
-        # Coding tasks
-        if any(w in query_lower for w in ["yaz", "kod", "script", "function", "debug", "python", "javascript", "html", "css"]):
-            logger.info("Routing to CODE model (Mistral)")
-            return config.MODEL_MAP["code"]
-        
-        # Complex reasoning / Long explanation
-        if any(w in query_lower for w in ["izah et", "nədir", "necə", "proses", "təhlil", "araşdır"]):
-            logger.info("Routing to COMPLEX model (Llama 3.2)")
-            return config.MODEL_MAP["complex"]
-        
-        # Logic / Math tasks
-        if any(w in query_lower for w in ["hesabla", "riyaziyyat", "məntiq", "isbat"]):
-            logger.info("Routing to LOGIC model (DeepSeek)")
-            return config.MODEL_MAP["logic"]
+        # Routing Logic
+        if any(w in query_lower for w in ["yaz", "kod", "script", "function", "debug"]):
+            target = config.MODEL_MAP["code"]
+        elif any(w in query_lower for w in ["izah et", "nədir", "necə", "araşdır"]):
+            target = config.MODEL_MAP["complex"]
+        elif any(w in query_lower for w in ["hesabla", "riyaziyyat", "məntiq"]):
+            target = config.MODEL_MAP["logic"]
+        elif len(query.split()) < 5:
+            target = config.MODEL_MAP["fast"]
 
-        # Default to fast for short or conversational queries
-        if len(query.split()) < 5:
-            logger.info("Routing to FAST model (Phi-3)")
-            return config.MODEL_MAP["fast"]
+        # Fallback Check
+        try:
+            import ollama
+            resp = ollama.list()
+            # Handle both object and dict-like responses
+            if hasattr(resp, 'models'):
+                installed = [m.model for m in resp.models]
+            elif isinstance(resp, dict) and 'models' in resp:
+                installed = [m.get('name') or m.get('model') for m in resp['models']]
+            else:
+                installed = []
 
-        return config.OLLAMA_MODEL
+            if target not in installed and f"{target}:latest" not in installed:
+                logger.warning(f"Model {target} not found. Falling back to {config.OLLAMA_MODEL}")
+                return config.OLLAMA_MODEL
+        except Exception as e:
+            logger.error(f"Router fallback check failed: {e}")
+            pass
+            
+        return target

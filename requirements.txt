@@ -1,10 +1,9 @@
 # Core
-python>=3.10
 ollama>=0.1.0
 
 # Audio (Modern alternatives)
-sounddevice>=0.4.6
-scipy>=1.11.0
+# sounddevice>=0.4.6
+# scipy>=1.11.0
 edge-tts>=6.1.9
 vosk>=0.3.45  # Offline STT
 pygame>=2.5.0
@@ -21,7 +20,8 @@ schedule>=1.2.0
 python-dotenv>=1.0.0
 PyYAML>=6.0.1
 cryptography>=41.0.0
-
+customtkinter>=5.2.0
+apscheduler>=3.10.0
 
 # APIs
 duckduckgo-search>=3.9.0
@@ -33,7 +33,6 @@ chromadb>=0.4.0
 trafilatura>=1.6.3
 mediapipe>=0.10.0
 ultralytics>=8.0.0
-# easyocr>=1.7.0 # Optional, heavy
 
 # Web Automation
 playwright>=1.38.0
@@ -46,12 +45,3 @@ google-auth-httplib2>=0.1.0
 PyGithub>=1.59.0
 notion-client>=2.2.1
 python-telegram-bot>=20.5
-apscheduler>=3.10.0
-
-# Utilities
-pyautogui>=0.9.54
-psutil>=5.9.5
-schedule>=1.2.0
-python-dotenv>=1.0.0
-PyYAML>=6.0.1
-cryptography>=41.0.0

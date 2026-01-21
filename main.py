@@ -1,7 +1,13 @@
+import sys
+import os
+import time
+import threading
+import queue
 import re
 import random
 import schedule
 import psutil
+import datetime
 from Jarvis.core.brain import JarvisBrain
 from Jarvis.core.config import config
 from Jarvis.core.router import TaskRouter
@@ -13,7 +19,12 @@ from Jarvis.features.web import WebEngine
 from Jarvis.features.api_hub import APIHub
 from Jarvis.utils.logger import logger
 from Jarvis.utils.security import SecurityManager
-from Jarvis.prompts import UNIFIED_SYSTEM_PROMPT
+from Jarvis.prompts import (
+    UNIFIED_SYSTEM_PROMPT, 
+    VISION_ENGINE_PROMPT, 
+    SELF_CODING_PROMPT, 
+    API_HUB_PROMPT
+)
 
 class JarvisAgent:
     def __init__(self):
@@ -62,11 +73,12 @@ class JarvisAgent:
         logger.info(f"Targeting model: {target_model}")
         
         context = self.brain.get_context(query)
-        from Jarvis import prompts
-        system_prompt = prompts.UNIFIED_SYSTEM_PROMPT
-        if "vision" in target_model.lower(): system_prompt = prompts.VISION_ENGINE_PROMPT
-        elif any(w in query.lower() for w in ["kod", "yaz", "debug"]): system_prompt = prompts.SELF_CODING_PROMPT
-        elif any(w in query.lower() for w in ["email", "github", "notion"]): system_prompt = prompts.API_HUB_PROMPT
+        
+        # Select appropriate prompt based on task
+        system_prompt = UNIFIED_SYSTEM_PROMPT
+        if "vision" in target_model.lower(): system_prompt = VISION_ENGINE_PROMPT
+        elif any(w in query.lower() for w in ["kod", "yaz", "debug"]): system_prompt = SELF_CODING_PROMPT
+        elif any(w in query.lower() for w in ["email", "github", "notion"]): system_prompt = API_HUB_PROMPT
 
         messages = [
             {"role": "system", "content": system_prompt},
@@ -107,7 +119,9 @@ class JarvisAgent:
             return content # Fallback if no CEVAP found
         except Exception as e:
             logger.error(f"Brain reasoning failed: {e}")
-            return "Zihnimdə bir xəta baş verdi, üzr istəyirəm."
+            import traceback
+            logger.error(traceback.format_exc())
+            return f"Zihnimdə bir xəta baş verdi: {str(e)}"
 
     def _run_scheduler(self):
         """Tier 4: Autonomous Task Execution Scheduler"""
