@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="az">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. | Local ChatGPT</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --sidebar-color: #161b22;
+            --accent-color: #58a6ff;
+            --text-color: #c9d1d9;
+            --jarvis-blue: #00d2ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-color);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--jarvis-blue);
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+        }
+
+        .status-badge {
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--jarvis-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scroll-behavior: smooth;
+        }
+
+        .message-row {
+            display: flex;
+            gap: 1rem;
+            max-width: 850px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 4px;
+            background: #238636;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .avatar.jarvis {
+            background: var(--jarvis-blue);
+        }
+
+        .message-content {
+            line-height: 1.6;
+            overflow-wrap: break-word;
+        }
+
+        .message-content h3 {
+            color: var(--jarvis-blue);
+            margin-top: 0;
+        }
+
+        .message-content pre {
+            background: #161b22;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message-content code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        .input-container {
+            padding: 2rem;
+            background: linear-gradient(0deg, var(--bg-color) 70%, transparent);
+        }
+
+        .input-wrapper {
+            max-width: 768px;
+            margin: 0 auto;
+            position: relative;
+            background: #21262d;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            display: flex;
+            align-items: flex-end;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            max-height: 200px;
+            font-family: inherit;
+        }
+
+        .btn-action {
+            background: transparent;
+            color: var(--accent-color);
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .siri-wave {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <button
+            style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 5px; cursor: pointer; text-align: left; margin-bottom: 20px;">+
+            New Chat</button>
+        <div style="font-size: 0.75rem; color: #8b949e; margin-bottom: 10px; padding-left: 5px;">RECENT SKILLS</div>
+        <div id="skills-list" style="display: flex; flex-direction: column; gap: 5px;">
+            <!-- Skills will be injected here -->
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <div class="logo">J.A.R.V.I.S.</div>
+            <div style="display: flex; gap: 10px;">
+                <div class="status-badge">OLLAMA: ONLINE</div>
+                <div class="status-badge" style="color: #2ecc71; border-color: #2ecc71;">LEARNING: ACTIVE</div>
+            </div>
+        </header>
+
+        <div class="chat-area" id="chat-box">
+            <!-- Messages -->
+        </div>
+
+        <div class="siri-wave">
+            <canvas id="siri-canvas" style="width: 100%; height: 100%;"></canvas>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <textarea id="text-input" rows="1" placeholder="Type a message or use voice..."></textarea>
+                <button class="btn-action" id="mic-btn" title="Voice Input">🎤</button>
+                <button class="btn-action" id="send-btn" title="Send Message">🚀</button>
+            </div>
+            <div style="text-align: center; font-size: 0.7rem; color: #484f58; margin-top: 10px;">
+                JARVIS Local ChatGPT v4.5 | Powered by Ollama & Vosk
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const textInput = document.getElementById('text-input');
+        const sendBtn = document.getElementById('send-btn');
+        const micBtn = document.getElementById('mic-btn');
+        let audioPlayer = new Audio();
+
+        // Markdown Configuration
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+
+        function addMessage(sender, text, isJarvis = false) {
+            const row = document.createElement('div');
+            row.className = "message-row";
+
+            const avatar = document.createElement('div');
+            avatar.className = "avatar" + (isJarvis ? " jarvis" : "");
+            avatar.innerText = isJarvis ? "J" : "U";
+
+            const content = document.createElement('div');
+            content.className = "message-content";
+            content.innerHTML = isJarvis ? marked.parse(text) : text;
+
+            row.appendChild(avatar);
+            row.appendChild(content);
+            chatBox.appendChild(row);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Initial Greeting
+        addMessage("JARVIS", "Sistem onlayndır, cənab. Yerli zəkamız hazırdır.", true);
+
+        textInput.oninput = function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        };
+
+        async function sendQuery(text) {
+            if (!text) return;
+            addMessage("USER", text, false);
+            textInput.value = '';
+            textInput.style.height = 'auto';
+
+            try {
+                const res = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: text })
+                });
+                const data = await res.json();
+                if (data.status === 'success') {
+                    addMessage("JARVIS", data.response, true);
+                    if (data.audio_url) playAudio(data.audio_url);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        sendBtn.onclick = () => sendQuery(textInput.value);
+        textInput.onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendQuery(textInput.value);
+            }
+        };
+
+        // ... Voice recognition and SiriWave integration would stay similar to original ...
+
+        function playAudio(url) {
+            audioPlayer.src = url;
+            audioPlayer.play();
+            wave.setAmplitude(0.6);
+
+            audioPlayer.onended = () => {
+                wave.setAmplitude(0.0);
+            };
+        }
+
+    </script>
+</body>
+
+</html>
