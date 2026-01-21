@@ -1,2 +1,15 @@
 .venv
-/.idea
+.venv11
+__pycache__/
+*.pyc
+*.mp3
+*.png
+build/
+dist/
+*.spec
+.idea/
+.vscode/
+*.log
+experience_logs/
+jarvis_chroma/
+model/
