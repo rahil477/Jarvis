@@ -175,11 +175,13 @@ class JarvisGUI(ctk.CTk):
                         frame = cv2.resize(frame, (400, 300))
                         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         img = Image.fromarray(frame)
-                        imgtk = ImageTk.PhotoImage(image=img)
+                        
+                        # Use CTkImage to avoid HighDPI warnings
+                        ctk_img = ctk.CTkImage(light_image=img, dark_image=img, size=(400, 300))
                         
                         if self.webcam_label and self.webcam_label.winfo_exists():
-                            self.webcam_label.configure(image=imgtk)
-                            self.webcam_label.image = imgtk
+                            self.webcam_label.configure(image=ctk_img)
+                            self.webcam_label.image = ctk_img  # Keep reference
                     else:
                         break
                     
