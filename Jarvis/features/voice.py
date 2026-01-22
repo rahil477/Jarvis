@@ -42,7 +42,8 @@ class VoiceEngine:
 
             try:
                 communicate = edge_tts.Communicate(adjusted_text, config.TTS_VOICE)
-                file_path = "speech.mp3"
+                # Use unique filename to prevent permission errors
+                file_path = f"speech_{int(time.time())}_{threading.get_ident()}.mp3"
                 asyncio.run(communicate.save(file_path))
                 
                 pygame.mixer.music.load(file_path)
@@ -53,13 +54,24 @@ class VoiceEngine:
                 pygame.mixer.music.play()
                 while pygame.mixer.music.get_busy():
                     time.sleep(0.1)
+                
+                # Cleanup after playing
+                pygame.mixer.music.unload()
+                
             except Exception as e:
                 logger.error(f"TTS Error: {e}")
             finally:
                 self.is_speaking = False
-                if os.path.exists("speech.mp3"):
-                    try: os.remove("speech.mp3")
-                    except: pass
+                # Try to clean up file with a small delay
+                try:
+                    if 'file_path' in locals() and os.path.exists(file_path):
+                        # Background cleanup to not block
+                        def cleanup(path):
+                            time.sleep(1)
+                            try: os.remove(path)
+                            except: pass
+                        threading.Thread(target=cleanup, args=(file_path,)).start()
+                except: pass
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -90,7 +102,22 @@ class VoiceEngine:
                         result = json.loads(rec.Result())
                         text = result.get("text", "")
                         if text:
-                            return text.lower()
+                            # TIER 1: Phonetic Correction
+                            # Vosk often mishears 'Jarvis' in Turkish/Azeri models
+                            corrections = {
+                                "yavuz": "jarvis",
+                                "havuç": "jarvis",
+                                "servis": "jarvis",
+                                "yalnız": "jarvis",
+                                "kabus": "jarvis",
+                                "kabusu": "jarvis",
+                                "masası": "jarvis" # often 'jarvis masası' -> 'havuç masası'
+                            }
+                            text_lower = text.lower()
+                            for wrong, right in corrections.items():
+                                text_lower = text_lower.replace(wrong, right)
+                                
+                            return text_lower
                             
         except Exception as e:
             logger.error(f"STT Error: {e}")
