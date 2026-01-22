@@ -28,13 +28,13 @@
                 "total": 0
             },
             "B": {
-                "success": 1,
-                "total": 1
+                "success": 4,
+                "total": 4
             }
         }
     },
     "performance_metrics": {
-        "avg_latency": 220.83908700942993,
-        "total_interactions": 1
+        "avg_latency": 88.13655066490173,
+        "total_interactions": 4
     }
 }
