@@ -16,11 +16,11 @@ class Config:
     
     # Tier 1: Multi-model Orchestration
     MODEL_MAP = {
-        "complex": "llama3.2:latest", # 70b placeholder if not available
-        "fast": "phi-3",
-        "code": "mistral",
+        "complex": "llama3.2:latest",
+        "fast": "phi3:mini",
+        "code": "mistral:latest",
         "logic": "deepseek-r1:7b",
-        "vision": "llava"
+        "vision": "llava:latest"
     }
     
     # Audio
