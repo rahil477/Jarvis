@@ -86,25 +86,28 @@ class JarvisAgent:
             {"role": "user", "content": query}
         ]
 
-        try:
-            for step in range(config.MAX_REASONING_STEPS):
-                import ollama
-                resp = ollama.chat(model=target_model, messages=messages)
-                content = resp['message']['content']
-                messages.append({"role": "assistant", "content": content})
+        retries = 3
+        for attempt in range(retries):
+            try:
+                for step in range(config.MAX_REASONING_STEPS):
+                    import ollama
+                    resp = ollama.chat(model=target_model, messages=messages)
+                    content = resp['message']['content']
+                    messages.append({"role": "assistant", "content": content})
 
-                # Tool Detection
-                match = re.search(r"(?:EYLEM|ACTION):\s*(\w+)\s*\|\s*(?:Input|Girdi):\s*(.*)", content, re.I)
-                if match:
-                    t_name, t_input = match.group(1).upper(), match.group(2).strip()
-                    if t_name in self.tools:
-                        logger.info(f"Executing Tool: {t_name}")
-                        obs = self.tools[t_name](t_input)
-                        messages.append({"role": "user", "content": f"GÖZLEM: {obs}"})
-                        continue
-                
-                if "CEVAP:" in content:
-                    final_text = content.split("CEVAP:")[1].strip()
+                    # Tool Detection
+                    match = re.search(r"(?:EYLEM|ACTION):\s*(\w+)\s*\|\s*(?:Input|Girdi):\s*(.*)", content, re.I)
+                    if match:
+                        t_name, t_input = match.group(1).upper(), match.group(2).strip()
+                        if t_name in self.tools:
+                            logger.info(f"Executing Tool: {t_name}")
+                            obs = self.tools[t_name](t_input)
+                            messages.append({"role": "user", "content": f"GÖZLEM: {obs}"})
+                            continue
+                    
+                    final_text = content
+                    if "CEVAP:" in content:
+                        final_text = content.split("CEVAP:")[1].strip()
                     
                     # Tier 2 Voice Adaptation
                     emotion = "urgent" if "!" in final_text else "neutral"
@@ -116,12 +119,13 @@ class JarvisAgent:
                     self.brain.add_to_episodic_memory(query, final_text, "Success")
                     return final_text
                     
-            return content # Fallback if no CEVAP found
-        except Exception as e:
-            logger.error(f"Brain reasoning failed: {e}")
-            import traceback
-            logger.error(traceback.format_exc())
-            return f"Zihnimdə bir xəta baş verdi: {str(e)}"
+            except Exception as e:
+                logger.error(f"Brain reasoning failed (Attempt {attempt+1}/{retries}): {e}")
+                if attempt == retries - 1:
+                    import traceback
+                    logger.error(traceback.format_exc())
+                    return f"Bağışlayın, sistemdə xəta baş verdi: {str(e)}"
+                time.sleep(1) # Wait before retry
 
     def _run_scheduler(self):
         """Tier 4: Autonomous Task Execution Scheduler"""
