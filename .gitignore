@@ -1,15 +1,27 @@
-.venv
-.venv11
+# Python
 __pycache__/
-*.pyc
-*.mp3
-*.png
-build/
-dist/
-*.spec
-.idea/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+
+# IDE
 .vscode/
+.idea/
+*.swp
+
+# Secret files
+.env
+config.yaml
+assistant_memory.json
+*.pth
+
+# Logs
 *.log
-experience_logs/
-jarvis_chroma/
-model/
+
+# OS
+.DS_Store
+Thumbs.db
