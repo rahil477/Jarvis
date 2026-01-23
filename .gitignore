@@ -7,6 +7,7 @@ __pycache__/
 venv/
 .venv/
 env/
+.venv11/
 
 # IDE
 .vscode/
@@ -18,9 +19,29 @@ env/
 config.yaml
 assistant_memory.json
 *.pth
+*.key
 
-# Logs
+# Logs & History
 *.log
+experience_logs/
+logs/
+
+# Build
+build/
+dist/
+*.spec
+
+# Media
+*.mp3
+*.wav
+*.png
+*.jpg
+Images/
+
+# Data
+data/
+model/
+jarvis_chroma/
 
 # OS
 .DS_Store

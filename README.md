@@ -1,127 +1,149 @@
-# Jarvis Desktop Voice Assistant🔥
+# 🦾 JARVIS ULTIMATE v5.0
 
-<img src="https://giffiles.alphacoders.com/212/212508.gif" alt="">
+> **Just A Rather Very Intelligent System** - Tony Stark inspired AI Assistant with Self-Learning, Vision, Voice Cloning, Web Automation, and Self-Coding capabilities.
 
-**Have you ever wondered how cool it would be to have your own assistant? Imagine how easier it would be doing Wikipedia searches without opening web browsers, and performing many other daily tasks like playing music with the help of a single voice command, opening different browsers in just a voice command.**
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)]()
+[![License](https://img.shields.io/badge/License-MIT-green)]()
+[![Status](https://img.shields.io/badge/Status-Active-success)]()
 
-**This project is simple desktop voice assistant built with python named as “Jarvis Desktop Voice Assistant”. This project is fully completed and error free. It was compiled in VS Code Editor.**
+## 🌟 Features
 
-**🔸 Let's be honest, it's not as intelligent as in the movie, but it can do a lot of cool things and automate your daily tasks you do on your personal computers/laptops.**
+### 🧠 Core Intelligence
+- **Multi-Model Reasoning**: Inductive, Deductive, Abductive, Analogical
+- **Self-Learning System**: Learns from every interaction
+- **Vector Memory**: ChromaDB for long-term semantic memory
+- **Context-Aware**: Understands user habits, preferences, routines
 
-## 📌Built with
+### 👁️ Vision Capabilities
+- **LLaVA Integration**: Screenshot understanding, code extraction
+- **OCR++**: Multi-language text recognition
+- **Error Diagnosis**: Visual error analysis and auto-fix
+- **UI Element Detection**: Smart element recognition
 
-<code><img height="30" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png"></code>
+### 🎙️ Voice System
+- **Voice Cloning**: Custom TTS with your voice (Coqui/XTTS)
+- **Emotion Detection**: Adapt tone based on user mood
+- **Multi-language**: Azeri, Turkish, English, Russian
+- **Celebrity Voices**: Tony Stark mode, Morgan Freeman, etc.
 
-## 📌Features
+### 🌐 Web Automation
+- **Smart Navigation**: AI-powered browser control
+- **Form Filling**: Auto-complete with user data
+- **Data Scraping**: Extract structured data from any site
+- **Multi-site Research**: Automated research reports
 
-It can do a lot of cool things, some of them being:
+### 📧 API Integration Hub
+- **Communication**: Gmail, Telegram, WhatsApp, Slack
+- **Productivity**: Google Calendar, Notion, Trello, Asana
+- **Development**: GitHub, GitLab, Stack Overflow
+- **Smart Home**: Philips Hue, Google Home, IFTTT
 
-- Greet user
-- Tell current time and date
-- Launch applications/softwares
-- Open any website
-- Tells about any person (via Wikipedia)
-- Can search anything on Google
-- Plays music
-- Take important note in text file
-- Can take screenshot and save it with custom filename
-- Can tell jokes
+### 💻 Self-Coding Engine
+- **Code Generation**: Full project creation from description
+- **Auto-Debugging**: Analyzes errors and auto-fixes
+- **Test Generation**: Unit tests automatically created
+- **Documentation**: Auto-generates comments and README
 
-## Requirements
+## 🚀 Quick Start
 
-Python 3.6+
+### Prerequisites
+- Python 3.10+
+- Ollama (for local LLMs)
+- Tesseract OCR (optional, for vision)
 
-## 📌Installation
+### Installation
 
-1. **Fork The Repository**
-   - Click the "Fork" button on the top right corner of the repository page.
+```bash
+# Clone repository
+git clone https://github.com/rahil477/Jarvis.git
+cd Jarvis
 
-2. **Clone The Repository**
-   - Clone the forked repository to your local machine:
-     ```bash
-     git clone <URL>
-     cd Jarvis-Desktop-Voice-Assistant
-     ```
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\activate     # Windows
 
-3.  **Create and Activate a Virtual Environment**
-     - Create a virtual environment:
-     ```bash
-     python -m venv .venv
-     ```
-   - Activate the virtual environment:
-     - For Windows:
-       ```bash
-       .venv\Scripts\activate
-       ```
-     - For macOS/Linux:
-       ```bash
-       source .venv/bin/activate
-       ```
-   - This activates the virtual environment and should look like `(venv) directory/of/your/project>`
+# Install dependencies
+pip install -r requirements.txt
 
-4. **Install Requirements**
+# Install Ollama
+# Visit: https://ollama.ai/download
+ollama pull llama3.2
 
-   - Install all the requirements given in **[requirements.txt](https://github.com/kishanrajput23/Jarvis-Desktop-Voice-Assistant/blob/main/requirements.txt)** by running the command `pip install -r requirements.txt`
+# Configure
+cp .env.example .env
+# Edit .env with your API keys
+```
 
-5. **Install PyAudio**  
-   - Follow the instructions given **[here](https://stackoverflow.com/questions/52283840/i-cant-install-pyaudio-on-windows-how-to-solve-error-microsoft-visual-c-14)**
+### Usage
 
-6. **Run the Assistant**
-  - Run the main script:
-    ```bash
-    python jarvis.py
-    ```
-  - Now Enjoy with your own assistant !!!!
+```bash
+# Terminal mode
+python main.py
 
-7. **Deactivate the Virtual Environment**
-   - After you're done, deactivate the virtual environment:
-     ```bash
-     deactivate
-     ```
+# GUI mode
+python jarvis_gui.py
 
-## 📌Contributing
+# Web dashboard
+python server.py
+# Visit: http://localhost:5000
+```
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+## 📖 Documentation
 
-## 📌Author
+- [Full Documentation](docs/README.md)
+- [API Reference](docs/api.md)
+- [Configuration Guide](docs/configuration.md)
+- [Development Guide](docs/development.md)
 
-👤 **Kishan Kumar Rai**
+## 🛠️ Architecture
 
-- Twitter: [@kishan_rajput23](https://twitter.com/kishan_rajput23)
-- Github: [@kishanrajput23](https://github.com/kishanrajput23)
-- LinkedIn: [@kishan-kumar-rai](https://linkedin.com/in/kishan-kumar-rai-23112000)
+```
+User Input (Voice/Text/Vision)
+        ↓
+   Orchestrator
+        ↓
+Multi-Reasoning Engine
+   ↓    ↓    ↓    ↓
+Vision Voice Web Self-Code
+        ↓
+  API Hub
+        ↓
+   Memory System
+        ↓
+Response (Voice/Text/Action)
+```
 
-## 📌Show your support
+## 🎯 Roadmap
 
-Please ⭐️ this repository if this project helped you!
+- [x] Basic voice commands
+- [x] Self-learning system
+- [x] Vision engine (LLaVA)
+- [ ] Voice cloning (in progress)
+- [ ] Web automation
+- [ ] API hub expansion
+- [ ] Self-coding engine
+- [ ] Mobile app (Flutter)
+- [ ] AR/VR integration
 
-## 📌License
+## 🤝 Contributing
 
-This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-## 📌Learning Resources to Extend This Project
+## 📜 License
 
-To build this project further and enhance its capabilities, a strong understanding of the following areas is recommended:
+MIT License - see [LICENSE](LICENSE)
 
-### 🐍 Python Fundamentals
-Python is the core language behind this project. A solid grasp of syntax, control flow, functions, and error handling will help you modify and extend the assistant’s functionality.  
-👉 [Python Programming Course](https://www.mygreatlearning.com/academy/premium/master-python-programming)
+## 👤 Author
 
-### 🎙️ Voice Processing & NLP
-Voice commands are processed using speech and text-based techniques. Understanding Natural Language Processing (NLP) concepts such as tokenization and text analysis can help improve voice interaction.  
-👉 [Introduction to NLP](https://www.mygreatlearning.com/academy/learn-for-free/courses/introduction-to-natural-language-processing)
+**Rahil Menefzade**
+- GitHub: [@rahil477](https://github.com/rahil477)
+- Location: Azerbaijan
 
-### 🤖 Intelligence & Generative AI
-Currently, the assistant follows predefined logic. By integrating Generative AI concepts, it can be enhanced into a conversational assistant capable of generating intelligent responses and performing web-based tasks.  
-👉 [Introduction to Generative AI](https://www.mygreatlearning.com/academy/premium/master-generative-ai)
+## 🙏 Acknowledgments
 
-### 👁️ Computer Vision
-To make the assistant more advanced, computer vision can be introduced for features like face detection and gesture control. Learning image and video processing fundamentals is a good starting point.  
-👉 [Computer Vision Essentials](https://www.mygreatlearning.com/academy/learn-for-free/courses/computer-vision-essentials)
-
-### 📄 Related Reading
-For a conceptual overview of building voice assistants in Python, you can refer to this article: [CLICK HERE](https://www.mygreatlearning.com/blog/jarvis-desktop-assistant-python-project/)
+Inspired by Tony Stark's JARVIS from Iron Man.
 
 ---
 
-> *Some learning resources mentioned above are shared as part of an educational collaboration.*
+Made with ❤️ in Azerbaijan 🇦🇿
