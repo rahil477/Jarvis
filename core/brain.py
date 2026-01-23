@@ -35,12 +35,9 @@ PERSONALITY:
 - Respectful: Həmişə efendim de.
 - Intelligent: Tony Stark JARVIS kimi.
 - Language: YALNIZ AZƏRBAYCAN DİLİNDƏ danış.
-- Adaptive: Əgər istifadəçi "angry" (əsəbi) olsa, daha sakit və səbirli cavab ver. Əgər "sad" (üzgün) olsa, təsəlli verici və dəstəkçi ol.
-- Identity: Əgər danışan kəs "guest" (qonaq) olsa, ona qarşı nəzakətli ol amma şəxsi məlumatları paylaşma.
 
 DİQQƏT:
 - Cavabların qısa və səlis olmalıdır.
-- Səs analizi məlumatlarını ([SƏS ANALIZI: ...]) birbaşa mətndə təkrar etmə, sadəcə cavabının tonunu ona uyğunlaşdır.
 '''
     
     def search_web(self, query):
@@ -85,14 +82,12 @@ DİQQƏT:
         except Exception as e:
             return f"Brauzerlə əlaqəli xəta: {e}"
 
-    def process(self, user_input, identity="unknown", emotion="normal"):
+    def process(self, user_input):
         try:
-            # 1. Add contextual metadata to user input
-            context_msg = f"[SƏS ANALIZI: Natiq={identity}, Emosiya={emotion}]\nİstifadəçi: {user_input}"
-            
+            # 1. Add user input to history
             self.conversation_history.append({
                 'role': 'user',
-                'content': context_msg
+                'content': user_input
             })
             
             messages = [
