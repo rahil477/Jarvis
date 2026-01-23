@@ -137,13 +137,12 @@ class JarvisGUI(ctk.CTk):
 
     def toggle_voice(self):
         if self.is_listening:
-            self.update_chat("SYSTEM", "Already listening...")
             return
             
         self.is_listening = True
+        self.mic_btn.configure(state="disabled", fg_color="#22c55e") # Green and disabled
         self.update_chat("SYSTEM", "🎤 Listening... (Speak now)")
         self.siri_wave.set_amplitude(0.7)
-        self.mic_btn.configure(fg_color="#22c55e")  # Green when active
         threading.Thread(target=self._voice_listen, daemon=True).start()
 
     def _voice_listen(self):
@@ -151,8 +150,12 @@ class JarvisGUI(ctk.CTk):
             query = self.agent.voice.listen(duration=5)
             if query and query.strip():
                 self.after(0, lambda: self.update_chat("YOU (voice)", query))
+                # Insert into entry but don't duplicate logic if send_query clears it
+                # self.after(0, lambda: self.entry.insert(0, query)) 
+                # Let's just set the entry text directly so send_query picks it up
+                self.after(0, lambda: self.entry.delete(0, "end"))
                 self.after(0, lambda: self.entry.insert(0, query))
-                self.after(0, self.send_query)
+                self.after(100, self.send_query) # Small delay to ensure text is set
             else:
                 self.after(0, lambda: self.update_chat("SYSTEM", "⚠️ No speech detected. Try again."))
         except Exception as e:
@@ -160,8 +163,12 @@ class JarvisGUI(ctk.CTk):
             logger.error(f"Voice listen error: {e}")
         finally:
             self.after(0, lambda: self.siri_wave.set_amplitude(0.0))
-            self.after(0, lambda: self.mic_btn.configure(fg_color="#ef4444"))
+            self.after(0, lambda: self.update_mic_button())
             self.is_listening = False
+            
+    def update_mic_button(self):
+        if self.mic_btn and self.mic_btn.winfo_exists():
+            self.mic_btn.configure(state="normal", fg_color="#ef4444")
     
     def _start_webcam(self):
         """Start webcam feed in background thread"""

@@ -24,17 +24,17 @@
         "active_variant": "A",
         "metrics": {
             "A": {
-                "success": 0,
-                "total": 0
+                "success": 1,
+                "total": 1
             },
             "B": {
-                "success": 4,
-                "total": 4
+                "success": 8,
+                "total": 8
             }
         }
     },
     "performance_metrics": {
-        "avg_latency": 88.13655066490173,
-        "total_interactions": 4
+        "avg_latency": 146.93071370654636,
+        "total_interactions": 9
     }
 }

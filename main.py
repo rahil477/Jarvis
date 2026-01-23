@@ -1,5 +1,10 @@
+import warnings
 import sys
 import os
+
+# Suppress warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
+warnings.filterwarnings("ignore", category=ResourceWarning)
 import time
 import threading
 import queue
