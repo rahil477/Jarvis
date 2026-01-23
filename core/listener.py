@@ -16,12 +16,11 @@ class VoiceListener:
         
         # Determine device
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"🧠 Whisper Model: medium (Device: {device}) yüklənir...")
+        print(f"🧠 Whisper Model: base (Device: {device}) yüklənir...")
         
         try:
-            # Load Whisper Medium model
-            # Options: tiny, base, small, medium, large
-            self.model = whisper.load_model("medium", device=device)
+            # Load Whisper Base model for speed
+            self.model = whisper.load_model("base", device=device)
             print("✓ Whisper Model hazırdır.")
         except Exception as e:
             print(f"❌ Model yüklənmədi: {e}")
@@ -90,9 +89,10 @@ class VoiceListener:
         audio_np = audio_np.astype(np.float32)
 
         # Transcribe
-        result = self.model.transcribe(audio_np, language="tr", fp16=torch.cuda.is_available())
+        # Use 'az' for Azerbaijani or None for auto-detection
+        result = self.model.transcribe(audio_np, language="az", fp16=torch.cuda.is_available())
         text = result["text"].strip()
         
         if text:
-            return text
-        return None
+            return text, audio_np
+        return None, None

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from core.brain import JarvisBrain
 from core.listener import VoiceListener
 from core.speaker import VoiceSpeaker
+from Jarvis.utils.voice_identifier import VoiceIdentifier
 import yaml
 import time
 
@@ -25,6 +26,7 @@ try:
     speaker = VoiceSpeaker()
     listener = VoiceListener(config)
     brain = JarvisBrain(config, speaker)
+    voice_analyzer = VoiceIdentifier()
 except Exception as e:
     print(f"❌ Initialization Error: {e}")
     sys.exit(1)
@@ -32,17 +34,31 @@ except Exception as e:
 speaker.speak(f'Sistemlər aktiv, {config.get("user", {}).get("name", "Efendim")}.')
 
 print('\n✓ JARVIS hazırdır!')
-print('🎤 Danışın və ya yazın (Ctrl+C ilə çıxış)')
+print('🎤 Danışın (Ctrl+C ilə çıxış)')
 print('=' * 50 + '\n')
 
 while True:
     try:
         print('🎤 Dinləyirəm...')
-        voice_input = listener.listen()
+        voice_text, audio_data = listener.listen()
         
-        if voice_input:
-            print(f'👤 Siz: {voice_input}')
-            response = brain.process(voice_input)
+        if voice_text:
+            print(f'👤 Siz: {voice_text}')
+            
+            # Analyze Voice
+            identity = voice_analyzer.identify_speaker(audio_data)
+            emotion = voice_analyzer.detect_emotion(audio_data)
+            
+            print(f'� Analiz: Natiq={identity}, Emosiya={emotion}')
+            
+            # Special command to register voice
+            if "mənim səsimi yadda saxla" in voice_text.lower() or "səsimi tanıt" in voice_text.lower():
+                response = voice_analyzer.save_profile(audio_data)
+                print(f'🤖 JARVIS: {response}')
+                speaker.speak(response)
+                continue
+
+            response = brain.process(voice_text, identity=identity, emotion=emotion)
             print(f'🤖 JARVIS: {response}')
             speaker.speak(response)
         
